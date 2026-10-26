@@ -1,0 +1,1 @@
+@("__pycache__/", "*.pyc", "week5_memory.json") | Set-Content .gitignore 
