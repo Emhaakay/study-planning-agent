@@ -73,6 +73,13 @@ python3 lab_agent.py
 ## Week 2 - Requirements Engineering 
  
 Week 2 adds stakeholder analysis, functional and non-functional requirements, AI-agent boundaries, user stories, acceptance criteria, traceability, and a Mermaid use-case-style model. The artefacts are stored in `docs/`. 
+
+## Week 3 – UML Structural Modeling 
+Week 3 adds structural models and a small Python domain-model application. Mermaid sources are stored in `docs/models/`, and `app.py` implements the same Student, Assignment, StudyPlan, and PlanItem concepts shown in the diagrams. 
+
+## Week 4 - Behavioral Modeling 
+ 
+Week 4 adds an executable planning workflow and three behavioral views of the same use case: an activity-style flowchart, a native Mermaid state machine, and a native Mermaid sequence diagram. The sequence model includes an AI-agent-style component calling a calendar tool and handling both success and failure. 
  
 ## Application Status 
  
@@ -99,30 +106,15 @@ main
  
 Do not begin a new laboratory from an old task branch. 
  
+ 
 ## Current Project Status 
  
 - Week 1: completed - Git workflow and introductory agent simulator 
 - Week 2: completed - requirements engineering and use-case modeling 
-- Week 3: next - UML structural modeling 
+- Week 3: completed – structural modeling and Python domain model
+- Week 4: completed - behavioral modeling and executable agent/tool workflow 
+- Week 5: next - architecture, interfaces, coupling/cohesion, and agent architecture 
 
-
-## Week 3 – UML Structural Modeling 
-Week 3 adds structural models and a small Python domain-model application. Mermaid sources are stored in `docs/models/`, and `app.py` implements the same Student, Assignment, StudyPlan, and PlanItem concepts shown in the diagrams. 
-
- 
-
-## Current Project Status 
-
- 
-
-- Week 1: completed – Git workflow and introductory agent simulator 
-
-- Week 2: completed – requirements engineering and use-case modeling 
-
-- Week 3: completed – structural modeling and Python domain model 
-
-- Week 4: next – activity, state machine, sequence diagrams, and executable behavior
- 
 ## Course 
  
 Software Engineering and AI Agent Fundamentals   
