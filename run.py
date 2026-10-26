@@ -1,55 +1,77 @@
-from datetime import date  # Import date so deterministic demonstration assignments can contain real deadlines. 
+from datetime import date  # Import date so deterministic demonstration assignments contain real deadlines. 
 
-import sys  # Import sys so command-line switches can select the normal and failure scenarios. 
+from pathlib import Path  # Import Path so the runtime database file can be created and reset safely. 
 
-from domain.models import Student, Assignment  # Import the stable domain input objects. 
+import sys  # Import sys so command-line flags can select success, missing-input, and failure scenarios. 
+
+from domain.models import Student, Assignment  # Import stable domain input objects. 
 
 from agent.planner import Planner  # Import the cohesive planning component. 
 
 from agent.orchestrator import StudyPlanningOrchestrator  # Import the application orchestrator that coordinates the use case. 
 
-from adapters.fake_calendar import FakeCalendarAdapter  # Import the concrete calendar adapter selected for this demonstration. 
+from adapters.fake_calendar import FakeCalendarAdapter  # Import the deterministic CalendarPort adapter used by the laboratory. 
 
-from adapters.json_memory import JsonMemoryStore  # Import the concrete persistent-memory adapter selected for this demonstration. 
+from adapters.sqlite_database import initialize_database  # Import the schema-initialization helper for the SQLite database. 
 
-def build_demo_input():  # Define deterministic input so students can compare runs with the Week 4 behavioral models. 
+from adapters.sqlite_memory import SQLiteMemoryStore  # Import the SQLite implementation of persistent agent memory. 
 
-    student = Student(student_id=1, name="Alex Student")  # Create the same example student used in earlier weeks. 
+from adapters.sqlite_repository import SQLiteStudyRepository  # Import the SQLite repository for students, assignments, requests, tool logs, and plans. 
 
-    assignments = [  # Create two assignments that the planner will schedule. 
+DATABASE_FILE = Path("study_planning_agent.db")  # Define the runtime SQLite database path used by the Week 6 demonstration. 
 
-        Assignment(assignment_id=101, title="Architecture Diagram", deadline=date(2026, 10, 4), estimated_hours=3.0, priority=1),  # Create the higher-priority architecture task. 
+def reset_database():  # Define a helper that removes runtime database files for deterministic classroom demonstrations. 
 
-        Assignment(assignment_id=102, title="Python Refactoring", deadline=date(2026, 10, 6), estimated_hours=4.0, priority=2),  # Create the second Week 5 task. 
+    for suffix in ["", "-shm", "-wal"]:  # Consider the main SQLite file and possible sidecar files created by SQLite journaling modes. 
 
-    ]  # Finish the deterministic assignment list. 
+        candidate = Path(str(DATABASE_FILE) + suffix)  # Build the full path of one possible runtime database file. 
 
-    return student, assignments  # Return both input values to the composition root. 
+        if candidate.exists():  # Check whether that runtime file currently exists. 
 
-def print_plan(plan):  # Define a small presentation helper that displays the generated result. 
+            candidate.unlink()  # Delete the old runtime file so the next demonstration starts with an empty database. 
 
-    for item in plan.items:  # Iterate through every PlanItem returned by the application. 
+def build_demo_input():  # Define deterministic domain input that can be compared with the Week 6 relational model. 
 
-        print(f"PLAN -> {item.scheduled_slot}: {item.assignment.title} ({item.planned_hours} h)")  # Print one readable line for each scheduled item. 
+    student = Student(student_id=1, name="Alex Student")  # Create the same example student used throughout the semester project. 
+
+    assignments = [Assignment(assignment_id=101, title="Relational Data Model", deadline=date(2026, 10, 11), estimated_hours=3.0, priority=1), Assignment(assignment_id=102, title="SQLite Persistence", deadline=date(2026, 10, 13), estimated_hours=4.0, priority=2)]  # Create two assignments whose identifiers become relational primary keys. 
+
+    return student, assignments  # Return both deterministic input values to the composition root. 
+
+def print_plan(plan):  # Define a presentation helper that displays generated plan items. 
+
+    for item in plan.items:  # Iterate through every PlanItem returned by the application layer. 
+
+        print(f"PLAN -> {item.scheduled_slot}: {item.assignment.title} ({item.planned_hours} h)")  # Print one readable summary line for each scheduled assignment. 
 
 if __name__ == "__main__":  # Execute the following composition-root code only when run.py is started directly. 
 
-    student, assignments = build_demo_input()  # Create the deterministic domain input used by all Week 5 scenarios. 
+    if "--reset-db" in sys.argv:  # Check whether the user requested a clean database for this run. 
 
-    calendar_fails = "--calendar-fail" in sys.argv  # Detect whether the user requested a simulated calendar-adapter failure. 
+        reset_database()  # Remove any earlier runtime database so generated identifiers start predictably. 
 
-    no_assignments = "--no-assignments" in sys.argv  # Detect whether the user requested the missing-input scenario. 
+    initialize_database(DATABASE_FILE)  # Create all normalized relational tables if they do not already exist. 
 
-    selected_assignments = [] if no_assignments else assignments  # Select empty or populated input according to the command-line scenario. 
+    print(f"DATABASE -> schema ready at {DATABASE_FILE}")  # Confirm that the relational schema is ready before application work begins. 
+
+    student, assignments = build_demo_input()  # Build the deterministic student and assignment objects. 
+
+    no_assignments = "--no-assignments" in sys.argv  # Detect the scenario where the user supplies no assignments. 
+
+    calendar_fails = "--calendar-fail" in sys.argv  # Detect the scenario where the external calendar tool fails. 
+
+    selected_assignments = [] if no_assignments else assignments  # Select the appropriate assignment list for the requested scenario. 
 
     planner = Planner()  # Construct the planning component. 
 
-    calendar = FakeCalendarAdapter(should_fail=calendar_fails)  # Construct the concrete CalendarPort adapter chosen for this run. 
+    calendar = FakeCalendarAdapter(should_fail=calendar_fails)  # Construct the deterministic calendar adapter for this scenario. 
 
-    memory = JsonMemoryStore()  # Construct the concrete MemoryStore adapter chosen for this run. 
+    memory = SQLiteMemoryStore(DATABASE_FILE)  # Construct persistent agent memory backed by the same relational database. 
 
-    application = StudyPlanningOrchestrator(planner=planner, calendar=calendar, memory=memory)  # Inject all dependencies into the orchestrator in one visible composition root. 
+    repository = SQLiteStudyRepository(DATABASE_FILE)  # Construct the relational repository used for business and trace data. 
 
-    plan = application.generate_plan(student=student, assignments=selected_assignments)  # Run the same planning use case that was modeled behaviorally in Week 4. 
+    application = StudyPlanningOrchestrator(planner=planner, calendar=calendar, memory=memory, repository=repository)  # Inject all dependencies into the orchestrator in one visible composition root. 
 
-    print_plan(plan)  # Display any generated plan items as the final observable program output.
+    plan = application.generate_plan(student=student, assignments=selected_assignments)  # Execute the same planning goal through persistent Week 6 architecture. 
+
+    print_plan(plan)  # Display any generated StudyPlan items after the use case completes. 

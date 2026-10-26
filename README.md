@@ -111,6 +111,9 @@ Week 3 adds structural models and a small Python domain-model application. Merma
 
 ## Week 5 - Software Architecture 
 Week 5 refactors the behavioral prototype into a small modular architecture. The project separates domain concepts, orchestration, planning, external ports, and concrete adapters. Mermaid diagrams document the decomposition and dependency direction.
+
+## Week 6 - Data Modeling and Persistence 
+Week 6 maps the Study Planning Agent domain model to a normalized relational schema and adds an executable SQLite persistence adapter. Students, assignments, plans and plan items are stored as business data. Planning-request state, memory events and calendar tool calls demonstrate persistence for agent workflows. 
  
 ## Application Status 
  
@@ -143,8 +146,9 @@ Do not begin a new laboratory from an old task branch.
 - Week 2: completed - requirements engineering and use-case modeling 
 - Week 3: completed - structural models and Python domain model 
 - Week 4: completed - behavioral models and executable agent workflow 
-- Week 5: completed - architectural decomposition, interfaces, coupling/cohesion, and agent architecture 
-- Week 6: next - conceptual data model, relational design, normalization, and persistence 
+- Week 5: completed - architectural decomposition and interfaces 
+- Week 6: completed - conceptual data model, relational design, normalization and SQLite persistence 
+- Week 7: next - coding standards, code review, branching and traceability 
 
 ## Course 
  
