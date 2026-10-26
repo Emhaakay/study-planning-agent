@@ -1,1 +1,8 @@
-@("__pycache__/", "*.pyc", "week5_memory.json") | Set-Content .gitignore 
+# @("__pycache__/", "*.pyc", "week5_memory.json") | Set-Content .gitignore // Week 5, i left it here
+
+__pycache__/ 
+*.pyc 
+week*_memory.json 
+*.db 
+*.db-shm 
+*.db-wal 
